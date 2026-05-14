@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Week 3 — Exploits & Defences. NOP sleds, shellcode, return-to-libc, ROP, ASLR, canaries, and NX bit." />
+  <title>Week 3 — Exploits & Defences | SecFlash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="week-page.css" />
+</head>
+<body>
+  <nav id="week-nav">
+    <a href="index.html" class="nav-home">Sec<span class="accent">Flash</span></a>
+    <div class="nav-weeks">
+      <a href="week2.html" class="nav-week-link">W2</a>
+      <a href="week3.html" class="nav-week-link active">W3</a>
+      <a href="week4.html" class="nav-week-link">W4</a>
+      <a href="week5.html" class="nav-week-link">W5</a>
+      <a href="week6.html" class="nav-week-link">W6</a>
+      <a href="week7.html" class="nav-week-link">W7</a>
+      <a href="week8.html" class="nav-week-link">W8</a>
+      <a href="week9.html" class="nav-week-link">W9</a>
+      <a href="week10.html" class="nav-week-link">W10</a>
+    </div>
+  </nav>
+
+  <main class="week-page">
+    <header class="week-hero">
+      <div class="week-hero-glow"></div>
+      <div class="week-hero-content">
+        <span class="week-badge">Week 3</span>
+        <h1>Exploits & <span class="accent">Defences</span></h1>
+        <p class="week-hero-sub">How attackers exploit buffer overflows using shellcode, NOP sleds, and advanced techniques like return-to-libc and ROP — and how ASLR, canaries, and NX defend against them.</p>
+      </div>
+    </header>
+
+    <section class="toc">
+      <h2>📑 Contents</h2>
+      <div class="toc-grid">
+        <a href="#exploitation" class="toc-item"><span class="toc-num">01</span><span class="toc-title">Exploitation Basics</span></a>
+        <a href="#payload" class="toc-item"><span class="toc-num">02</span><span class="toc-title">Payloads & NOP Sleds</span></a>
+        <a href="#shellcode" class="toc-item"><span class="toc-num">03</span><span class="toc-title">Shellcode</span></a>
+        <a href="#advanced" class="toc-item"><span class="toc-num">04</span><span class="toc-title">Advanced Attacks</span></a>
+        <a href="#defences" class="toc-item"><span class="toc-num">05</span><span class="toc-title">Defences</span></a>
+      </div>
+    </section>
+
+    <!-- Exploitation Basics -->
+    <section class="knowledge-section" id="exploitation">
+      <div class="section-header"><span class="section-icon">⚡</span><h2>Exploitation Basics</h2></div>
+      <div class="knowledge-card">
+        <h3>The Main Attack Vector</h3>
+        <p>In a stack-based buffer overflow, the primary attack vector is overwriting the <strong>return address</strong> so that when the function returns, execution jumps to an attacker-controlled address instead of the legitimate caller.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>The 3 Steps of a Buffer Overflow Exploit</h3>
+        <div class="attack-flow">
+          <div class="attack-step">1. Overflow the buffer</div>
+          <span class="attack-arrow">→</span>
+          <div class="attack-step">2. Overwrite return address</div>
+          <span class="attack-arrow">→</span>
+          <div class="attack-step">3. Redirect execution</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Payloads -->
+    <section class="knowledge-section" id="payload">
+      <div class="section-header"><span class="section-icon">📦</span><h2>Payloads & NOP Sleds</h2></div>
+      <div class="knowledge-card">
+        <h3>NOP Sled</h3>
+        <p>A <strong>NOP sled</strong> is a sequence of NOP (No Operation) instructions placed before shellcode. The CPU "slides" through them into the shellcode, making exploits more <strong>reliable</strong> because the exact jump address doesn't need to be perfect.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Malicious Payload Structure</h3>
+        <div class="code-block"><pre><code>┌─────────┬────────────────────┬──────────┬────────────┐
+│ padding │ new return address │ NOP sled │  shellcode │
+└─────────┴────────────────────┴──────────┴────────────┘</code></pre></div>
+        <ul>
+          <li><strong>Padding</strong> — fills the buffer up to the return address</li>
+          <li><strong>New return address</strong> — points into the NOP sled</li>
+          <li><strong>NOP sled</strong> — slides execution into shellcode</li>
+          <li><strong>Shellcode</strong> — the actual malicious code</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Shellcode -->
+    <section class="knowledge-section" id="shellcode">
+      <div class="section-header"><span class="section-icon">🐚</span><h2>Shellcode</h2></div>
+      <div class="knowledge-card">
+        <h3>What Is Shellcode?</h3>
+        <p>Shellcode is small <strong>malicious machine code</strong> injected by an attacker, typically designed to spawn a shell (<code>/bin/sh</code>) or execute arbitrary commands. It must be position-independent and avoid null bytes (which terminate strings in C).</p>
+      </div>
+    </section>
+
+    <!-- Advanced Attacks -->
+    <section class="knowledge-section" id="advanced">
+      <div class="section-header"><span class="section-icon">🧬</span><h2>Advanced Attacks</h2></div>
+      <div class="knowledge-card">
+        <h3>Return-to-libc</h3>
+        <p>Instead of injecting shellcode, this attack redirects execution to <strong>existing library functions</strong> like <code>system()</code>. It bypasses the <strong>NX bit</strong> because it uses existing executable code rather than code on the stack.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Return-Oriented Programming (ROP)</h3>
+        <p>An advanced technique chaining small existing instruction sequences called <strong>gadgets</strong> — each ending in <code>ret</code>. By carefully arranging return addresses on the stack, attackers build arbitrary programs from existing code fragments.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Comparison of Attack Techniques</h3>
+        <div class="comparison-grid">
+          <div class="comparison-item">
+            <h4>🔴 Shellcode</h4>
+            <p>Injects <strong>new code</strong> onto the stack and executes it. Blocked by NX bit.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>🟡 Return-to-libc</h4>
+            <p>Calls an <strong>existing function</strong> (e.g. <code>system()</code>). Bypasses NX. Limited to single function calls.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>🟣 ROP</h4>
+            <p>Chains <strong>existing gadgets</strong> for arbitrary computation. Bypasses NX. Most powerful technique.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Defences -->
+    <section class="knowledge-section" id="defences">
+      <div class="section-header"><span class="section-icon">🛡️</span><h2>Defences</h2></div>
+      <div class="knowledge-card">
+        <h3>ASLR — Address Space Layout Randomization</h3>
+        <p><strong>Randomises memory addresses</strong> each time a program runs, making exploits unreliable because attackers can't predict where code or data will be.</p>
+        <p><strong>Bypasses:</strong> Brute force (try many addresses), information leaks (discover addresses at runtime).</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Stack Canary</h3>
+        <p>A <strong>random value</strong> placed between the buffer and the return address. Before returning, the program checks if the canary was modified. If it was, the overflow is detected and the program crashes safely.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>NX Bit (Non-Executable Memory)</h3>
+        <p>A hardware defence that marks memory regions (like the stack) as <strong>non-executable</strong>. Even if shellcode is injected, it cannot run.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Defence vs. Bypass Summary</h3>
+        <table class="info-table">
+          <thead><tr><th>Defence</th><th>How It Works</th><th>Bypass Method</th></tr></thead>
+          <tbody>
+            <tr><td><strong>NX Bit</strong></td><td>Stack is non-executable</td><td>Return-to-libc / ROP</td></tr>
+            <tr><td><strong>ASLR</strong></td><td>Randomised addresses</td><td>Info leaks / brute force</td></tr>
+            <tr><td><strong>Canaries</strong></td><td>Detect stack corruption</td><td>Bypass or leak canary value</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="knowledge-card">
+        <h3>The Best Defence</h3>
+        <p><strong>Secure coding practices</strong> — bounds checking, input validation, and avoiding unsafe functions like <code>gets()</code> and <code>strcpy()</code>. Hardware defences are important but can be bypassed; writing safe code is the most reliable mitigation.</p>
+        <div class="callout callout-success"><strong>Remember:</strong> All the hardware defences add layers, but secure coding is the <em>foundation</em>.</div>
+      </div>
+    </section>
+
+    <div class="week-nav-bottom">
+      <a href="week2.html" class="week-nav-link">← Week 2: Fundamentals</a>
+      <a href="week4.html" class="week-nav-link">Week 4: Format Strings →</a>
+    </div>
+  </main>
+</body>
+</html>

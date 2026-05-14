@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Week 7 — XSS, CSRF & Sessions. Cross-site scripting, cross-site request forgery, session management, and cookie security." />
+  <title>Week 7 — XSS, CSRF & Sessions | SecFlash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="week-page.css" />
+</head>
+<body>
+  <nav id="week-nav">
+    <a href="index.html" class="nav-home">Sec<span class="accent">Flash</span></a>
+    <div class="nav-weeks">
+      <a href="week2.html" class="nav-week-link">W2</a>
+      <a href="week3.html" class="nav-week-link">W3</a>
+      <a href="week4.html" class="nav-week-link">W4</a>
+      <a href="week5.html" class="nav-week-link">W5</a>
+      <a href="week6.html" class="nav-week-link">W6</a>
+      <a href="week7.html" class="nav-week-link active">W7</a>
+      <a href="week8.html" class="nav-week-link">W8</a>
+      <a href="week9.html" class="nav-week-link">W9</a>
+      <a href="week10.html" class="nav-week-link">W10</a>
+    </div>
+  </nav>
+
+  <main class="week-page">
+    <header class="week-hero">
+      <div class="week-hero-glow"></div>
+      <div class="week-hero-content">
+        <span class="week-badge">Week 7</span>
+        <h1>XSS, CSRF & <span class="accent">Sessions</span></h1>
+        <p class="week-hero-sub">Client-side web attacks — cross-site scripting (XSS), cross-site request forgery (CSRF), session management vulnerabilities, and cookie security flags.</p>
+      </div>
+    </header>
+
+    <section class="toc">
+      <h2>📑 Contents</h2>
+      <div class="toc-grid">
+        <a href="#sop-http" class="toc-item"><span class="toc-num">01</span><span class="toc-title">SOP & HTTP</span></a>
+        <a href="#xss" class="toc-item"><span class="toc-num">02</span><span class="toc-title">XSS Attacks</span></a>
+        <a href="#xss-defence" class="toc-item"><span class="toc-num">03</span><span class="toc-title">XSS Defences</span></a>
+        <a href="#csrf" class="toc-item"><span class="toc-num">04</span><span class="toc-title">CSRF</span></a>
+        <a href="#sessions" class="toc-item"><span class="toc-num">05</span><span class="toc-title">Session Management</span></a>
+        <a href="#cookies" class="toc-item"><span class="toc-num">06</span><span class="toc-title">Cookie Security</span></a>
+      </div>
+    </section>
+
+    <!-- SOP & HTTP -->
+    <section class="knowledge-section" id="sop-http">
+      <div class="section-header"><span class="section-icon">🌍</span><h2>SOP & HTTP</h2></div>
+      <div class="knowledge-card">
+        <h3>Why HTTP Is Stateless</h3>
+        <p>Each HTTP request/response is <strong>independent</strong> with no memory of previous interactions. The server doesn't inherently know if two requests come from the same user. This is why we need cookies and session tokens.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Same Origin Policy</h3>
+        <p>Prevents scripts from one site from <strong>accessing data from another site</strong>. An origin is defined by <strong>scheme + host + port</strong>. Without SOP, any website could read your banking data.</p>
+      </div>
+    </section>
+
+    <!-- XSS Attacks -->
+    <section class="knowledge-section" id="xss">
+      <div class="section-header"><span class="section-icon">⚡</span><h2>Cross-Site Scripting (XSS)</h2></div>
+      <div class="knowledge-card">
+        <h3>What Is XSS?</h3>
+        <p>Injecting malicious JavaScript into a web page so it <strong>runs in the victim's browser</strong>. The script executes with the same privileges as legitimate scripts on that page.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Consequences of XSS</h3>
+        <ul>
+          <li><strong>Session hijacking</strong> — steal session cookies</li>
+          <li><strong>Unauthorized actions</strong> — perform actions as the victim</li>
+          <li><strong>Data theft</strong> — read sensitive page content</li>
+          <li><strong>Phishing</strong> — modify page content to trick users</li>
+        </ul>
+      </div>
+      <div class="knowledge-card">
+        <h3>Stored vs Reflected XSS</h3>
+        <div class="comparison-grid">
+          <div class="comparison-item">
+            <h4>📦 Stored XSS</h4>
+            <p>Malicious script is <strong>saved in the database</strong> (e.g., in a comment). Executes for every user who views the page. More dangerous — persistent.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>🪃 Reflected XSS</h4>
+            <p>Malicious script comes from a <strong>crafted URL or request</strong>. Only affects users who click the malicious link. Requires social engineering.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- XSS Defences -->
+    <section class="knowledge-section" id="xss-defence">
+      <div class="section-header"><span class="section-icon">🛡️</span><h2>XSS Defences</h2></div>
+      <div class="knowledge-card">
+        <h3>Root Cause</h3>
+        <p>Lack of proper <strong>input validation and sanitization</strong>. The server fails to distinguish between data and code when rendering user input into HTML.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>HTML Encoding</h3>
+        <p>Converting dangerous characters to their HTML entity equivalents so browsers treat them as <strong>data rather than executable code</strong>.</p>
+        <table class="info-table">
+          <thead><tr><th>Character</th><th>Encoded As</th><th>Prevents</th></tr></thead>
+          <tbody>
+            <tr><td><code>&lt;</code></td><td><code>&amp;lt;</code></td><td>Tag injection</td></tr>
+            <tr><td><code>&gt;</code></td><td><code>&amp;gt;</code></td><td>Tag closing</td></tr>
+            <tr><td><code>&amp;</code></td><td><code>&amp;amp;</code></td><td>Entity injection</td></tr>
+            <tr><td><code>"</code></td><td><code>&amp;quot;</code></td><td>Attribute breakout</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CSRF -->
+    <section class="knowledge-section" id="csrf">
+      <div class="section-header"><span class="section-icon">🎭</span><h2>Cross-Site Request Forgery (CSRF)</h2></div>
+      <div class="knowledge-card">
+        <h3>What Is CSRF?</h3>
+        <p>Tricking a victim's browser into sending <strong>authenticated requests</strong> to a target site using the victim's existing session cookies. The attacker doesn't need to steal credentials — the browser sends them automatically.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Root Cause</h3>
+        <p>Servers cannot distinguish <strong>trusted same-site requests</strong> from <strong>forged cross-site requests</strong>. Both carry the same cookies.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>CSRF Defences</h3>
+        <table class="info-table">
+          <thead><tr><th>Defence</th><th>How It Works</th></tr></thead>
+          <tbody>
+            <tr><td><code>SameSite=Strict</code></td><td>Prevents cookies from being sent with <strong>cross-site requests</strong></td></tr>
+            <tr><td><strong>CSRF Token</strong></td><td>A secret random token embedded in forms. Attackers can't read it due to SOP, so forged requests fail validation.</td></tr>
+            <tr><td><strong>Referer Check</strong></td><td>Verify the request originates from the same site</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Session Management -->
+    <section class="knowledge-section" id="sessions">
+      <div class="section-header"><span class="section-icon">🔑</span><h2>Session Management</h2></div>
+      <div class="knowledge-card">
+        <h3>Goal of Session Management</h3>
+        <p>Maintaining <strong>user state across multiple requests</strong> in a stateless HTTP protocol. Sessions link requests to a specific authenticated user.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Session Token Dangers</h3>
+        <table class="info-table">
+          <thead><tr><th>Vulnerability</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Tokens in URLs</strong></td><td>Leak through browser history, shared links, and Referer headers</td></tr>
+            <tr><td><strong>Session Fixation</strong></td><td>Attacker forces victim to use a <strong>known session ID</strong> before login. After login, attacker uses the same ID to hijack the session.</td></tr>
+            <tr><td><strong>Predictable Tokens</strong></td><td>If tokens are guessable, attackers can forge them</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Cookie Security -->
+    <section class="knowledge-section" id="cookies">
+      <div class="section-header"><span class="section-icon">🍪</span><h2>Cookie Security</h2></div>
+      <div class="knowledge-card">
+        <h3>Essential Cookie Flags</h3>
+        <table class="info-table">
+          <thead><tr><th>Flag</th><th>Purpose</th><th>Protects Against</th></tr></thead>
+          <tbody>
+            <tr><td><code>HttpOnly</code></td><td>Blocks JavaScript access to the cookie</td><td>XSS cookie theft</td></tr>
+            <tr><td><code>Secure</code></td><td>Cookie sent only over HTTPS</td><td>Network sniffing</td></tr>
+            <tr><td><code>SameSite</code></td><td>Controls cross-site cookie sending</td><td>CSRF attacks</td></tr>
+          </tbody>
+        </table>
+        <div class="callout callout-info"><strong>Best Practice:</strong> Always set <code>HttpOnly</code>, <code>Secure</code>, and <code>SameSite=Strict</code> on session cookies for maximum protection.</div>
+      </div>
+    </section>
+
+    <div class="week-nav-bottom">
+      <a href="week6.html" class="week-nav-link">← Week 6: Web Security</a>
+      <a href="week8.html" class="week-nav-link">Week 8: Security Testing →</a>
+    </div>
+  </main>
+</body>
+</html>

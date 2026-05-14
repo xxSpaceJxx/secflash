@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Week 2 — Fundamentals & Buffer Overflows. Detailed study notes for software security." />
+  <title>Week 2 — Fundamentals & Buffer Overflows | SecFlash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="week-page.css" />
+</head>
+<body>
+  <nav id="week-nav">
+    <a href="index.html" class="nav-home">Sec<span class="accent">Flash</span></a>
+    <div class="nav-weeks">
+      <a href="week2.html" class="nav-week-link active">W2</a>
+      <a href="week3.html" class="nav-week-link">W3</a>
+      <a href="week4.html" class="nav-week-link">W4</a>
+      <a href="week5.html" class="nav-week-link">W5</a>
+      <a href="week6.html" class="nav-week-link">W6</a>
+      <a href="week7.html" class="nav-week-link">W7</a>
+      <a href="week8.html" class="nav-week-link">W8</a>
+      <a href="week9.html" class="nav-week-link">W9</a>
+      <a href="week10.html" class="nav-week-link">W10</a>
+    </div>
+  </nav>
+
+  <main class="week-page">
+    <header class="week-hero">
+      <div class="week-hero-glow"></div>
+      <div class="week-hero-content">
+        <span class="week-badge">Week 2</span>
+        <h1>Fundamentals & <span class="accent">Buffer Overflows</span></h1>
+        <p class="week-hero-sub">Understanding how programs run at the OS level, C memory layout, stack mechanics, and why buffer overflows are one of the most dangerous vulnerability classes.</p>
+      </div>
+    </header>
+
+    <section class="toc">
+      <h2>📑 Contents</h2>
+      <div class="toc-grid">
+        <a href="#fundamentals" class="toc-item"><span class="toc-num">01</span><span class="toc-title">Fundamentals</span></a>
+        <a href="#c-basics" class="toc-item"><span class="toc-num">02</span><span class="toc-title">C Basics & Pointers</span></a>
+        <a href="#memory-layout" class="toc-item"><span class="toc-num">03</span><span class="toc-title">Memory Layout</span></a>
+        <a href="#registers" class="toc-item"><span class="toc-num">04</span><span class="toc-title">Registers</span></a>
+        <a href="#stack-frames" class="toc-item"><span class="toc-num">05</span><span class="toc-title">Stack Frames</span></a>
+        <a href="#buffer-overflow" class="toc-item"><span class="toc-num">06</span><span class="toc-title">Buffer Overflow</span></a>
+        <a href="#stack-overflow" class="toc-item"><span class="toc-num">07</span><span class="toc-title">Stack Overflow Exploits</span></a>
+      </div>
+    </section>
+
+    <!-- Fundamentals -->
+    <section class="knowledge-section" id="fundamentals">
+      <div class="section-header"><span class="section-icon">🔍</span><h2>Fundamentals</h2></div>
+      <div class="knowledge-card">
+        <h3>Why OS-Level Understanding Matters</h3>
+        <p>Understanding how programs execute at the operating system level is <strong>critical for security</strong>. It explains <strong>how vulnerabilities arise</strong>. By understanding memory layout, CPU execution, and stack behaviour, you can see why exploits like <strong>buffer overflows</strong> are possible.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>The Trade-Off of Using C</h3>
+        <p>C provides <strong>fast, low-level control</strong> — but has a <strong>high risk of memory errors</strong> due to:</p>
+        <ul>
+          <li>No automatic bounds checking on arrays</li>
+          <li>Manual memory management (malloc/free)</li>
+          <li>Direct pointer manipulation</li>
+          <li>No built-in string type with safety guarantees</li>
+        </ul>
+        <div class="callout callout-warning"><strong>Key Insight:</strong> The same features that make C powerful also make it dangerous.</div>
+      </div>
+    </section>
+
+    <!-- C Basics -->
+    <section class="knowledge-section" id="c-basics">
+      <div class="section-header"><span class="section-icon">⚙️</span><h2>C Basics & Pointers</h2></div>
+      <div class="knowledge-card">
+        <h3>Pointer Operators</h3>
+        <table class="info-table">
+          <thead><tr><th>Operator</th><th>Name</th><th>Purpose</th></tr></thead>
+          <tbody>
+            <tr><td><code>&</code></td><td>Address-of</td><td>Gets the <strong>memory address</strong> of a variable</td></tr>
+            <tr><td><code>*</code></td><td>Dereference</td><td><strong>Accesses the value</strong> stored at a pointer's address</td></tr>
+          </tbody>
+        </table>
+        <div class="code-block"><pre><code>int x = 42;
+int *ptr = &x;      // ptr holds address of x
+printf("%d", *ptr); // prints 42</code></pre></div>
+      </div>
+    </section>
+
+    <!-- Memory Layout -->
+    <section class="knowledge-section" id="memory-layout">
+      <div class="section-header"><span class="section-icon">🧠</span><h2>Memory Layout</h2></div>
+      <div class="knowledge-card">
+        <h3>The 5 Memory Segments</h3>
+        <div class="memory-diagram">
+          <div class="mem-segment mem-stack"><strong>Stack</strong><span>Function calls & local variables</span><span class="mem-dir">↓ grows downward</span></div>
+          <div class="mem-gap">⋮</div>
+          <div class="mem-segment mem-heap"><strong>Heap</strong><span>Dynamic memory (malloc/free)</span><span class="mem-dir">↑ grows upward</span></div>
+          <div class="mem-segment mem-bss"><strong>BSS</strong><span>Uninitialised global variables</span></div>
+          <div class="mem-segment mem-data"><strong>Data</strong><span>Initialised global variables</span></div>
+          <div class="mem-segment mem-text"><strong>Text</strong><span>Compiled machine code (read-only)</span></div>
+        </div>
+        <div class="callout callout-info"><strong>Growth Directions:</strong> Stack grows <strong>downward</strong> (high→low), heap grows <strong>upward</strong> (low→high). They grow toward each other.</div>
+      </div>
+    </section>
+
+    <!-- Registers -->
+    <section class="knowledge-section" id="registers">
+      <div class="section-header"><span class="section-icon">📟</span><h2>Registers</h2></div>
+      <div class="knowledge-card">
+        <h3>ESP and EBP</h3>
+        <table class="info-table">
+          <thead><tr><th>Register</th><th>Name</th><th>Role</th></tr></thead>
+          <tbody>
+            <tr><td><code>ESP</code></td><td>Stack Pointer</td><td>Points to the <strong>top of the stack</strong></td></tr>
+            <tr><td><code>EBP</code></td><td>Frame Pointer</td><td>Points to the <strong>base of current stack frame</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Stack Frames -->
+    <section class="knowledge-section" id="stack-frames">
+      <div class="section-header"><span class="section-icon">📚</span><h2>Stack Frames</h2></div>
+      <div class="knowledge-card">
+        <h3>What Happens During a Function Call</h3>
+        <ol class="step-list">
+          <li><strong>Arguments pushed</strong> onto the stack</li>
+          <li><strong>Return address pushed</strong> — where to resume after return</li>
+          <li><strong>Old EBP saved</strong> — preserves caller's frame pointer</li>
+          <li><strong>New stack frame created</strong> — EBP = ESP, locals allocated</li>
+        </ol>
+      </div>
+      <div class="knowledge-card">
+        <h3>Stack Frame Layout</h3>
+        <div class="code-block"><pre><code>  High Addresses
+┌──────────────────┐
+│   Arguments      │  ← passed by caller
+├──────────────────┤
+│  Return Address  │  ← where to go after return
+├──────────────────┤
+│    Saved EBP     │  ← caller's frame pointer
+├──────────────────┤
+│  Local Variables │  ← function's own data
+└──────────────────┘
+  Low Addresses (ESP)</code></pre></div>
+        <div class="callout callout-warning"><strong>Security Implication:</strong> The return address sits <em>above</em> local variables. A local buffer overflow can overwrite it.</div>
+      </div>
+    </section>
+
+    <!-- Buffer Overflow -->
+    <section class="knowledge-section" id="buffer-overflow">
+      <div class="section-header"><span class="section-icon">💥</span><h2>Buffer Overflow</h2></div>
+      <div class="knowledge-card">
+        <h3>What Is a Buffer Overflow?</h3>
+        <p>Writing <strong>beyond allocated memory bounds</strong>, potentially overwriting nearby memory such as variables or the <strong>return address</strong>.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Why They Happen in C</h3>
+        <ul>
+          <li><strong>No bounds checking</strong> — C does not verify array indices</li>
+          <li><strong>Unsafe functions</strong> — <code>strcpy()</code>, <code>gets()</code> copy without size limits</li>
+          <li><strong>Unvalidated user input</strong> — no automatic sanitisation</li>
+        </ul>
+      </div>
+      <div class="knowledge-card">
+        <h3>Consequences</h3>
+        <div class="consequence-grid">
+          <div class="consequence-item consequence-low"><span class="consequence-level">Level 1</span><strong>Crash</strong><p>Segmentation fault</p></div>
+          <div class="consequence-item consequence-med"><span class="consequence-level">Level 2</span><strong>Data Corruption</strong><p>Overwritten variables</p></div>
+          <div class="consequence-item consequence-high"><span class="consequence-level">Level 3</span><strong>Security Bypass</strong><p>Auth flags overwritten</p></div>
+          <div class="consequence-item consequence-crit"><span class="consequence-level">Level 4</span><strong>Code Execution</strong><p>Full system compromise</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stack Overflow -->
+    <section class="knowledge-section" id="stack-overflow">
+      <div class="section-header"><span class="section-icon">🎯</span><h2>Stack Overflow Exploits</h2></div>
+      <div class="knowledge-card">
+        <h3>Vulnerable Code Example</h3>
+        <div class="code-block"><pre><code>char buffer[12];
+strcpy(buffer, str);  // ⚠️ No bounds checking!</code></pre></div>
+        <p>If <code>str</code> exceeds 12 bytes, it overwrites adjacent stack data including the <strong>return address</strong>.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Controlling the Return Address</h3>
+        <p>If an attacker controls the return address, they can <strong>redirect execution</strong> to malicious code — achieving <strong>arbitrary code execution</strong>.</p>
+        <div class="callout callout-danger"><strong>Critical:</strong> This is the foundation of all stack-based exploitation techniques covered in Week 3.</div>
+      </div>
+    </section>
+
+    <div class="week-nav-bottom">
+      <span class="week-nav-disabled">← No Previous Week</span>
+      <a href="week3.html" class="week-nav-link">Week 3: Exploits & Defences →</a>
+    </div>
+  </main>
+</body>
+</html>

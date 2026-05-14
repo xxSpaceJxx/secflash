@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Interactive flashcard revision tool for software security and C programming exam preparation." />
+  <title>SecFlash — Software Security Revision</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ===== HERO / LANDING ===== -->
+  <header id="hero">
+    <div class="hero-bg-glow"></div>
+    <div class="hero-content">
+      <span class="hero-badge">🛡️ Exam Revision</span>
+      <h1>Sec<span class="accent">Flash</span></h1>
+      <p class="hero-sub">Interactive flashcards for <strong>Software Security &amp; C Programming</strong>. Flip, learn, repeat.</p>
+      <button id="start-btn" class="btn-primary">Start Studying</button>
+      <div class="hero-week-links">
+        <p class="hero-links-label">📖 Detailed Study Notes</p>
+        <div class="hero-links-grid">
+          <a href="week2.html" class="hero-week-chip">Week 2</a>
+          <a href="week3.html" class="hero-week-chip">Week 3</a>
+          <a href="week4.html" class="hero-week-chip">Week 4</a>
+          <a href="week5.html" class="hero-week-chip">Week 5</a>
+          <a href="week6.html" class="hero-week-chip">Week 6</a>
+          <a href="week7.html" class="hero-week-chip">Week 7</a>
+          <a href="week8.html" class="hero-week-chip">Week 8</a>
+          <a href="week9.html" class="hero-week-chip">Week 9</a>
+          <a href="week10.html" class="hero-week-chip">Week 10</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== MAIN APP ===== -->
+  <main id="app" class="hidden">
+    <!-- Top Bar -->
+    <nav id="topbar">
+      <div class="topbar-left">
+        <button id="home-btn" class="icon-btn" title="Back to home">🏠</button>
+        <span class="logo-sm">Sec<span class="accent">Flash</span></span>
+      </div>
+      <div class="topbar-center">
+        <div id="progress-wrapper">
+          <div id="progress-bar"></div>
+        </div>
+        <span id="progress-text">0 / 0</span>
+      </div>
+      <div class="topbar-right">
+        <button id="shuffle-btn" class="icon-btn" title="Shuffle cards">🔀</button>
+        <button id="reset-btn" class="icon-btn" title="Reset progress">↺</button>
+      </div>
+    </nav>
+
+    <!-- Week Tabs -->
+    <section id="week-bar">
+      <button class="week-btn active" data-week="all">All Weeks</button>
+      <button class="week-btn" data-week="2">Week 2</button>
+      <button class="week-btn" data-week="3">Week 3</button>
+      <button class="week-btn" data-week="4">Week 4</button>
+      <button class="week-btn" data-week="5">Week 5</button>
+      <button class="week-btn" data-week="6">Week 6</button>
+      <button class="week-btn" data-week="7">Week 7</button>
+      <button class="week-btn" data-week="8">Week 8</button>
+      <button class="week-btn" data-week="9">Week 9</button>
+      <button class="week-btn" data-week="10">Week 10</button>
+    </section>
+
+    <!-- Category Filter -->
+    <section id="category-bar">
+      <button class="cat-btn active" data-cat="all">All</button>
+    </section>
+
+    <!-- Flashcard Area -->
+    <section id="card-area">
+      <button id="prev-btn" class="nav-arrow" aria-label="Previous card">‹</button>
+
+      <div id="card-container">
+        <div id="flashcard" class="card">
+          <div class="card-face card-front">
+            <span class="card-label">Question</span>
+            <p id="card-question"></p>
+            <span class="card-hint">Click to reveal answer</span>
+          </div>
+          <div class="card-face card-back">
+            <span class="card-label">Answer</span>
+            <div id="card-answer"></div>
+          </div>
+        </div>
+      </div>
+
+      <button id="next-btn" class="nav-arrow" aria-label="Next card">›</button>
+    </section>
+
+    <!-- Bottom Controls -->
+    <section id="bottom-controls">
+      <button id="mark-known-btn" class="pill-btn known">✓ Got it</button>
+      <span id="card-counter">1 / 1</span>
+      <button id="mark-unknown-btn" class="pill-btn unknown">✗ Review</button>
+    </section>
+
+    <!-- Score Board -->
+    <section id="scoreboard">
+      <div class="score-item known-score">
+        <span class="score-num" id="known-count">0</span>
+        <span class="score-label">Mastered</span>
+      </div>
+      <div class="score-item unknown-score">
+        <span class="score-num" id="unknown-count">0</span>
+        <span class="score-label">Review</span>
+      </div>
+      <div class="score-item remaining-score">
+        <span class="score-num" id="remaining-count">0</span>
+        <span class="score-label">Remaining</span>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===== COMPLETION SCREEN ===== -->
+  <section id="complete-screen" class="hidden">
+    <div class="complete-content">
+      <div class="complete-icon">🎉</div>
+      <h2>Deck Complete!</h2>
+      <p id="complete-summary"></p>
+      <div class="complete-actions">
+        <button id="review-missed-btn" class="btn-primary">Review Missed Cards</button>
+        <button id="restart-btn" class="btn-secondary">Restart All</button>
+      </div>
+    </div>
+  </section>
+
+  <script src="cards.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

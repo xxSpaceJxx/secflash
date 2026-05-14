@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Week 10 — Secure Software Development & Threat Modelling. SSDLC, STRIDE, risk management, and secure design principles." />
+  <title>Week 10 — Secure Development & Threat Modelling | SecFlash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="week-page.css" />
+</head>
+<body>
+  <nav id="week-nav">
+    <a href="index.html" class="nav-home">Sec<span class="accent">Flash</span></a>
+    <div class="nav-weeks">
+      <a href="week2.html" class="nav-week-link">W2</a>
+      <a href="week3.html" class="nav-week-link">W3</a>
+      <a href="week4.html" class="nav-week-link">W4</a>
+      <a href="week5.html" class="nav-week-link">W5</a>
+      <a href="week6.html" class="nav-week-link">W6</a>
+      <a href="week7.html" class="nav-week-link">W7</a>
+      <a href="week8.html" class="nav-week-link">W8</a>
+      <a href="week9.html" class="nav-week-link">W9</a>
+      <a href="week10.html" class="nav-week-link active">W10</a>
+    </div>
+  </nav>
+
+  <main class="week-page">
+    <header class="week-hero">
+      <div class="week-hero-glow"></div>
+      <div class="week-hero-content">
+        <span class="week-badge">Week 10</span>
+        <h1>Secure Development & <span class="accent">Threat Modelling</span></h1>
+        <p class="week-hero-sub">Integrating security into the software development lifecycle — secure by design, STRIDE threat modelling, risk management, and core secure design principles.</p>
+      </div>
+    </header>
+
+    <section class="toc">
+      <h2>📑 Contents</h2>
+      <div class="toc-grid">
+        <a href="#ssdlc" class="toc-item"><span class="toc-num">01</span><span class="toc-title">Secure SDLC</span></a>
+        <a href="#risk" class="toc-item"><span class="toc-num">02</span><span class="toc-title">Risk Management</span></a>
+        <a href="#threat-model" class="toc-item"><span class="toc-num">03</span><span class="toc-title">Threat Modelling</span></a>
+        <a href="#stride" class="toc-item"><span class="toc-num">04</span><span class="toc-title">STRIDE</span></a>
+        <a href="#design-principles" class="toc-item"><span class="toc-num">05</span><span class="toc-title">Design Principles</span></a>
+        <a href="#secure-coding" class="toc-item"><span class="toc-num">06</span><span class="toc-title">Secure Coding</span></a>
+      </div>
+    </section>
+
+    <!-- SSDLC -->
+    <section class="knowledge-section" id="ssdlc">
+      <div class="section-header"><span class="section-icon">🔄</span><h2>Secure Software Development Lifecycle</h2></div>
+      <div class="knowledge-card">
+        <h3>Secure by Design</h3>
+        <p>Security should be integrated into <strong>every phase</strong> of software development rather than added later as an afterthought. The goal is to build software that remains secure even under malicious attack.</p>
+        <div class="attack-flow">
+          <div class="attack-step">Requirements<br><small>Security requirements</small></div>
+          <span class="attack-arrow">→</span>
+          <div class="attack-step">Design<br><small>Threat modelling</small></div>
+          <span class="attack-arrow">→</span>
+          <div class="attack-step">Implementation<br><small>Secure coding</small></div>
+          <span class="attack-arrow">→</span>
+          <div class="attack-step">Testing<br><small>Security testing</small></div>
+          <span class="attack-arrow">→</span>
+          <div class="attack-step">Deployment<br><small>Hardening</small></div>
+        </div>
+        <div class="callout callout-warning"><strong>Key Principle:</strong> Fixing security issues becomes exponentially more expensive as you move later in the development lifecycle. Build it in from the start.</div>
+      </div>
+    </section>
+
+    <!-- Risk Management -->
+    <section class="knowledge-section" id="risk">
+      <div class="section-header"><span class="section-icon">📊</span><h2>Risk Management</h2></div>
+      <div class="knowledge-card">
+        <h3>Key Steps in Applied Risk Management</h3>
+        <ol class="step-list">
+          <li><strong>Identify assets/business context</strong> — what needs protecting</li>
+          <li><strong>Identify technical and business risks</strong> — what could go wrong</li>
+          <li><strong>Prioritise risks</strong> — which risks matter most</li>
+          <li><strong>Define mitigation strategies</strong> — how to reduce risk</li>
+          <li><strong>Implement and validate fixes</strong> — apply and verify mitigations</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Threat Modelling -->
+    <section class="knowledge-section" id="threat-model">
+      <div class="section-header"><span class="section-icon">🗺️</span><h2>Threat Modelling</h2></div>
+      <div class="knowledge-card">
+        <h3>What Is Threat Modelling?</h3>
+        <p>A <strong>structured process</strong> used to identify, analyse, and mitigate threats against a system. It creates a model of the system and explicitly defines what attackers are capable of doing.</p>
+        <p>Threat modelling answers four key questions:</p>
+        <ul>
+          <li><strong>What are we building?</strong> — system architecture</li>
+          <li><strong>What can go wrong?</strong> — threat identification</li>
+          <li><strong>What are we going to do about it?</strong> — mitigations</li>
+          <li><strong>Did we do a good job?</strong> — validation</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- STRIDE -->
+    <section class="knowledge-section" id="stride">
+      <div class="section-header"><span class="section-icon">🎯</span><h2>STRIDE Threat Model</h2></div>
+      <div class="knowledge-card">
+        <h3>The STRIDE Categories</h3>
+        <p>STRIDE is a framework for categorising security threats. Each letter represents a type of threat:</p>
+        <div class="comparison-grid">
+          <div class="comparison-item">
+            <h4>🎭 Spoofing</h4>
+            <p>Impersonating a user or system. Violates <strong>authentication</strong>.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>✏️ Tampering</h4>
+            <p>Unauthorised modification of data. Violates <strong>integrity</strong>.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>🚫 Repudiation</h4>
+            <p>Denying an action was performed. Violates <strong>non-repudiation</strong>.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>📤 Information Disclosure</h4>
+            <p>Exposing data to unauthorised parties. Violates <strong>confidentiality</strong>.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>⛔ Denial of Service</h4>
+            <p>Making a system unavailable. Violates <strong>availability</strong>.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>👑 Elevation of Privilege</h4>
+            <p>Gaining unauthorised access levels. Violates <strong>authorisation</strong>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Design Principles -->
+    <section class="knowledge-section" id="design-principles">
+      <div class="section-header"><span class="section-icon">🏛️</span><h2>Secure Design Principles</h2></div>
+      <div class="knowledge-card">
+        <h3>Core Principles</h3>
+        <div class="principle-grid">
+          <div class="principle-item">
+            <div class="principle-icon">🔑</div>
+            <h4>Least Privilege</h4>
+            <p>Every user and process should operate with the <strong>minimum privileges necessary</strong>. Limits damage if compromised.</p>
+          </div>
+          <div class="principle-item">
+            <div class="principle-icon">🧅</div>
+            <h4>Defence in Depth</h4>
+            <p>Use <strong>multiple layers of security</strong> so if one fails, others still protect the system.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Secure Coding -->
+    <section class="knowledge-section" id="secure-coding">
+      <div class="section-header"><span class="section-icon">💻</span><h2>Secure Coding</h2></div>
+      <div class="knowledge-card">
+        <h3>Three Key Techniques for User Input</h3>
+        <ol class="step-list">
+          <li><strong>Input validation</strong> — ensure input is acceptable (type, length, range, format)</li>
+          <li><strong>Canonicalization</strong> — convert data into a standard form before validation (e.g., resolve <code>../</code> in paths)</li>
+          <li><strong>Sanitization</strong> — remove, encode, or escape dangerous input characters</li>
+        </ol>
+        <div class="callout callout-success"><strong>Defence in Depth Applied:</strong> Use all three techniques together. Validate first, canonicalize, then sanitize. Each layer catches what the others might miss.</div>
+      </div>
+    </section>
+
+    <div class="week-nav-bottom">
+      <a href="week9.html" class="week-nav-link">← Week 9: Dynamic Analysis</a>
+      <span class="week-nav-disabled">No Next Week →</span>
+    </div>
+  </main>
+</body>
+</html>

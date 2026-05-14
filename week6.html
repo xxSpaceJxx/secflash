@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Week 6 — Web Security & SQL Injection. Three-tier architecture, SQL injection, parameterised queries, and browser security." />
+  <title>Week 6 — Web Security & SQL Injection | SecFlash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="week-page.css" />
+</head>
+<body>
+  <nav id="week-nav">
+    <a href="index.html" class="nav-home">Sec<span class="accent">Flash</span></a>
+    <div class="nav-weeks">
+      <a href="week2.html" class="nav-week-link">W2</a>
+      <a href="week3.html" class="nav-week-link">W3</a>
+      <a href="week4.html" class="nav-week-link">W4</a>
+      <a href="week5.html" class="nav-week-link">W5</a>
+      <a href="week6.html" class="nav-week-link active">W6</a>
+      <a href="week7.html" class="nav-week-link">W7</a>
+      <a href="week8.html" class="nav-week-link">W8</a>
+      <a href="week9.html" class="nav-week-link">W9</a>
+      <a href="week10.html" class="nav-week-link">W10</a>
+    </div>
+  </nav>
+
+  <main class="week-page">
+    <header class="week-hero">
+      <div class="week-hero-glow"></div>
+      <div class="week-hero-content">
+        <span class="week-badge">Week 6</span>
+        <h1>Web Security & <span class="accent">SQL Injection</span></h1>
+        <p class="week-hero-sub">Three-tier web architecture, the Same Origin Policy, SQL injection attack techniques, parameterised queries, and browser sandboxing.</p>
+      </div>
+    </header>
+
+    <section class="toc">
+      <h2>📑 Contents</h2>
+      <div class="toc-grid">
+        <a href="#web-arch" class="toc-item"><span class="toc-num">01</span><span class="toc-title">Web Architecture</span></a>
+        <a href="#sqli" class="toc-item"><span class="toc-num">02</span><span class="toc-title">SQL Injection</span></a>
+        <a href="#sqli-defence" class="toc-item"><span class="toc-num">03</span><span class="toc-title">SQLi Defences</span></a>
+        <a href="#browser-sec" class="toc-item"><span class="toc-num">04</span><span class="toc-title">Browser Security</span></a>
+      </div>
+    </section>
+
+    <!-- Web Architecture -->
+    <section class="knowledge-section" id="web-arch">
+      <div class="section-header"><span class="section-icon">🌐</span><h2>Web Architecture</h2></div>
+      <div class="knowledge-card">
+        <h3>Three-Tier Architecture</h3>
+        <div class="attack-flow">
+          <div class="attack-step">🖥️ Client / Browser</div>
+          <span class="attack-arrow">→</span>
+          <div class="attack-step">⚙️ Web Server</div>
+          <span class="attack-arrow">→</span>
+          <div class="attack-step">🗄️ Database Server</div>
+        </div>
+        <p>Each tier introduces its own attack surface. SQL injection targets the boundary between the web server and database.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>GET vs POST</h3>
+        <table class="info-table">
+          <thead><tr><th>Method</th><th>Data Location</th><th>Visibility</th><th>Use Case</th></tr></thead>
+          <tbody>
+            <tr><td><strong>GET</strong></td><td>URL query string</td><td>Visible in URL, logs, history</td><td>Read/fetch data</td></tr>
+            <tr><td><strong>POST</strong></td><td>Request body</td><td>Not visible in URL</td><td>Submit/modify data</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="knowledge-card">
+        <h3>Same Origin Policy (SOP)</h3>
+        <p>The SOP enforces that scripts can only access data from the <strong>same domain and protocol</strong>. An origin is defined by the combination of <strong>scheme + host + port</strong>.</p>
+        <p>This prevents a malicious page from reading sensitive data from another site (e.g., your bank).</p>
+      </div>
+    </section>
+
+    <!-- SQL Injection -->
+    <section class="knowledge-section" id="sqli">
+      <div class="section-header"><span class="section-icon">💉</span><h2>SQL Injection</h2></div>
+      <div class="knowledge-card">
+        <h3>What Is SQL Injection?</h3>
+        <p>Injecting malicious SQL through user input because the application <strong>treats input as executable SQL code</strong> rather than data.</p>
+        <div class="code-block"><pre><code>-- Intended query:
+SELECT * FROM users WHERE name = 'bob' AND pass = 'secret'
+
+-- Injected input: bob' OR 5=5 --
+SELECT * FROM users WHERE name = 'bob' OR 5=5 --' AND pass = 'secret'
+                                         ^^^^^^     ^^
+                                     always true    commented out</code></pre></div>
+      </div>
+      <div class="knowledge-card">
+        <h3>How <code>bob' OR 5=5 --</code> Bypasses Login</h3>
+        <p><code>OR 5=5</code> is always true, so the WHERE clause matches <strong>every row</strong> in the table. The <code>--</code> comments out the rest of the query (the password check).</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>DROP TABLE Injection</h3>
+        <p>An attacker can inject <code>; DROP TABLE users --</code> to <strong>permanently delete</strong> the entire users table. This is a destructive attack that may be irreversible without backups.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Second-Order SQL Injection</h3>
+        <p>Malicious data is stored safely in the database, then later <strong>reused unsafely</strong> in another query. This makes it harder to detect because the injection doesn't happen at the initial input point.</p>
+      </div>
+    </section>
+
+    <!-- SQLi Defences -->
+    <section class="knowledge-section" id="sqli-defence">
+      <div class="section-header"><span class="section-icon">🛡️</span><h2>SQLi Defences</h2></div>
+      <div class="knowledge-card">
+        <h3>Why Escaping Quotes Is Insufficient</h3>
+        <p>While escaping single quotes stops basic string injection, it fails against:</p>
+        <ul>
+          <li><strong>Numeric injection</strong> — no quotes needed for integer fields</li>
+          <li><strong>Second-order injection</strong> — data escaped on input but not when reused</li>
+          <li><strong>Encoding tricks</strong> — alternative character encodings bypass filters</li>
+        </ul>
+      </div>
+      <div class="knowledge-card">
+        <h3>Parameterised Queries — The Gold Standard</h3>
+        <p>A parameterised query <strong>separates SQL code from data</strong> using placeholders. The database engine treats bound values strictly as <strong>data, never as executable code</strong>.</p>
+        <div class="code-block"><pre><code>// ❌ VULNERABLE — string concatenation
+query = "SELECT * FROM users WHERE name='" + input + "'";
+
+// ✅ SAFE — parameterised query
+query = "SELECT * FROM users WHERE name = ?";
+stmt.bind(1, input);</code></pre></div>
+        <div class="callout callout-success"><strong>Why it works:</strong> The database parser processes the SQL structure first, then binds data separately. Injected SQL is treated as a literal string value.</div>
+      </div>
+    </section>
+
+    <!-- Browser Security -->
+    <section class="knowledge-section" id="browser-sec">
+      <div class="section-header"><span class="section-icon">🔒</span><h2>Browser Security</h2></div>
+      <div class="knowledge-card">
+        <h3>Browser Sandbox</h3>
+        <p>A restriction system limiting JavaScript's access to the OS and other browser contexts. Scripts run in an isolated environment and cannot freely access the file system, other tabs, or system resources.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Unifying Security Principle</h3>
+        <div class="callout callout-warning"><strong>Never treat untrusted input as executable code.</strong> This principle connects buffer overflows (machine code injection), format strings (format specifier injection), SQL injection (SQL code injection), and XSS (JavaScript injection).</div>
+      </div>
+    </section>
+
+    <div class="week-nav-bottom">
+      <a href="week5.html" class="week-nav-link">← Week 5: Race Conditions</a>
+      <a href="week7.html" class="week-nav-link">Week 7: XSS & CSRF →</a>
+    </div>
+  </main>
+</body>
+</html>

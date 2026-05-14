@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Week 8 — Security Testing & Static Analysis. Source code review, SAST, control flow graphs, and control flow integrity." />
+  <title>Week 8 — Security Testing & Static Analysis | SecFlash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="week-page.css" />
+</head>
+<body>
+  <nav id="week-nav">
+    <a href="index.html" class="nav-home">Sec<span class="accent">Flash</span></a>
+    <div class="nav-weeks">
+      <a href="week2.html" class="nav-week-link">W2</a>
+      <a href="week3.html" class="nav-week-link">W3</a>
+      <a href="week4.html" class="nav-week-link">W4</a>
+      <a href="week5.html" class="nav-week-link">W5</a>
+      <a href="week6.html" class="nav-week-link">W6</a>
+      <a href="week7.html" class="nav-week-link">W7</a>
+      <a href="week8.html" class="nav-week-link active">W8</a>
+      <a href="week9.html" class="nav-week-link">W9</a>
+      <a href="week10.html" class="nav-week-link">W10</a>
+    </div>
+  </nav>
+
+  <main class="week-page">
+    <header class="week-hero">
+      <div class="week-hero-glow"></div>
+      <div class="week-hero-content">
+        <span class="week-badge">Week 8</span>
+        <h1>Security Testing & <span class="accent">Static Analysis</span></h1>
+        <p class="week-hero-sub">The three levels of security testing, source code review, static analysis tools (SAST), control flow graphs, and control flow integrity as a defence mechanism.</p>
+      </div>
+    </header>
+
+    <section class="toc">
+      <h2>📑 Contents</h2>
+      <div class="toc-grid">
+        <a href="#sec-testing" class="toc-item"><span class="toc-num">01</span><span class="toc-title">Security Testing</span></a>
+        <a href="#code-review" class="toc-item"><span class="toc-num">02</span><span class="toc-title">Source Code Review</span></a>
+        <a href="#sast" class="toc-item"><span class="toc-num">03</span><span class="toc-title">Static Analysis (SAST)</span></a>
+        <a href="#cfg" class="toc-item"><span class="toc-num">04</span><span class="toc-title">Control Flow Graphs</span></a>
+        <a href="#cfi" class="toc-item"><span class="toc-num">05</span><span class="toc-title">Control Flow Integrity</span></a>
+      </div>
+    </section>
+
+    <!-- Security Testing -->
+    <section class="knowledge-section" id="sec-testing">
+      <div class="section-header"><span class="section-icon">🧪</span><h2>Security Testing</h2></div>
+      <div class="knowledge-card">
+        <h3>Functional Testing vs Security Testing</h3>
+        <div class="comparison-grid">
+          <div class="comparison-item">
+            <h4>✅ Functional Testing</h4>
+            <p>Checks whether software <strong>behaves correctly</strong> for legitimate inputs and use cases.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>🔴 Security Testing</h4>
+            <p>Checks whether the program can enter a <strong>dangerous state</strong> — crashes, memory corruption, code execution, data leaks.</p>
+          </div>
+        </div>
+      </div>
+      <div class="knowledge-card">
+        <h3>Three Levels of Security Testing</h3>
+        <ol class="step-list">
+          <li><strong>Risk-based security testing</strong> — prioritise testing based on risk assessment</li>
+          <li><strong>Source code review (White-box)</strong> — examine code with full access to source</li>
+          <li><strong>Fuzz testing / Penetration testing (Black-box)</strong> — test from outside without source access</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Source Code Review -->
+    <section class="knowledge-section" id="code-review">
+      <div class="section-header"><span class="section-icon">📖</span><h2>Source Code Review</h2></div>
+      <div class="knowledge-card">
+        <h3>Common Issues Found</h3>
+        <ul>
+          <li><strong>Hardcoded passwords/keys</strong> — credentials embedded in source code</li>
+          <li><strong>Improper input validation</strong> — missing or insufficient checks</li>
+          <li><strong>Dangerous functions</strong> — use of <code>strcpy()</code>, <code>gets()</code>, <code>sprintf()</code></li>
+          <li><strong>Resource leaks</strong> — unclosed files, sockets, or memory</li>
+          <li><strong>Memory safety issues</strong> — buffer overflows, use-after-free</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- SAST -->
+    <section class="knowledge-section" id="sast">
+      <div class="section-header"><span class="section-icon">🔍</span><h2>Static Analysis (SAST)</h2></div>
+      <div class="knowledge-card">
+        <h3>What Is SAST?</h3>
+        <p>Static Analysis Security Testing analyses source code <strong>without executing the program</strong> to detect potential security vulnerabilities. Tools scan for known dangerous patterns, unsafe function calls, and potential data flow issues.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Advantages</h3>
+        <ul>
+          <li>Quickly find common vulnerabilities at scale</li>
+          <li>Automate repetitive analysis tasks</li>
+          <li>Help developers focus on the riskiest code sections</li>
+          <li>Can be integrated into CI/CD pipelines</li>
+        </ul>
+      </div>
+      <div class="knowledge-card">
+        <h3>False Positives & False Negatives</h3>
+        <div class="comparison-grid">
+          <div class="comparison-item">
+            <h4>🟡 False Positive</h4>
+            <p>Tool reports a vulnerability that is <strong>not actually a bug</strong>. Wastes developer time investigating non-issues.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>🔴 False Negative</h4>
+            <p>Tool <strong>misses a real vulnerability</strong>. Creates a false sense of security. More dangerous.</p>
+          </div>
+        </div>
+      </div>
+      <div class="knowledge-card">
+        <h3>Limitations of SAST</h3>
+        <ul>
+          <li>Cannot detect all vulnerabilities (no tool is perfect)</li>
+          <li>Miss design-level flaws and business logic errors</li>
+          <li>Depend on predefined rules — novel attacks may be missed</li>
+          <li>Can produce many false positives, causing alert fatigue</li>
+        </ul>
+        <div class="callout callout-info"><strong>Key Takeaway:</strong> SAST is a valuable tool but must be combined with other testing approaches (dynamic analysis, manual review) for comprehensive coverage.</div>
+      </div>
+    </section>
+
+    <!-- Control Flow Graphs -->
+    <section class="knowledge-section" id="cfg">
+      <div class="section-header"><span class="section-icon">📊</span><h2>Control Flow Graphs</h2></div>
+      <div class="knowledge-card">
+        <h3>What Is a CFG?</h3>
+        <p>A <strong>Control Flow Graph</strong> represents the possible execution paths in a program. Nodes are <strong>basic blocks</strong> (sequences of instructions with no branches), and edges represent possible control flow transitions between them.</p>
+        <p>CFGs are used by compilers for optimisation, by static analysis tools for vulnerability detection, and by CFI for runtime protection.</p>
+      </div>
+    </section>
+
+    <!-- Control Flow Integrity -->
+    <section class="knowledge-section" id="cfi">
+      <div class="section-header"><span class="section-icon">🔐</span><h2>Control Flow Integrity</h2></div>
+      <div class="knowledge-card">
+        <h3>What Is CFI?</h3>
+        <p>A security defence ensuring a program only follows <strong>valid execution paths</strong> defined by its Control Flow Graph. Any attempt to deviate from the expected control flow is detected and the program is terminated.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>How CFI Prevents Attacks</h3>
+        <p>CFI checks indirect jumps and calls at runtime. If execution attempts to follow an <strong>invalid control-flow path</strong>, the program aborts. This prevents:</p>
+        <ul>
+          <li><strong>ROP attacks</strong> — chained gadgets violate expected control flow</li>
+          <li><strong>Return-to-libc</strong> — unexpected function calls detected</li>
+          <li><strong>Shellcode execution</strong> — jumping to injected code is not in the CFG</li>
+        </ul>
+        <div class="callout callout-success"><strong>Why It's Effective:</strong> Unlike ASLR or canaries, CFI provides a principled defence based on program semantics rather than randomisation.</div>
+      </div>
+    </section>
+
+    <div class="week-nav-bottom">
+      <a href="week7.html" class="week-nav-link">← Week 7: XSS & CSRF</a>
+      <a href="week9.html" class="week-nav-link">Week 9: Dynamic Analysis →</a>
+    </div>
+  </main>
+</body>
+</html>

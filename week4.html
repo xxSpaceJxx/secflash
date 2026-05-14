@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Week 4 — Format Strings & Memory Safety. Format string exploits, memory safety concepts, and command injection." />
+  <title>Week 4 — Format Strings & Memory Safety | SecFlash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="week-page.css" />
+</head>
+<body>
+  <nav id="week-nav">
+    <a href="index.html" class="nav-home">Sec<span class="accent">Flash</span></a>
+    <div class="nav-weeks">
+      <a href="week2.html" class="nav-week-link">W2</a>
+      <a href="week3.html" class="nav-week-link">W3</a>
+      <a href="week4.html" class="nav-week-link active">W4</a>
+      <a href="week5.html" class="nav-week-link">W5</a>
+      <a href="week6.html" class="nav-week-link">W6</a>
+      <a href="week7.html" class="nav-week-link">W7</a>
+      <a href="week8.html" class="nav-week-link">W8</a>
+      <a href="week9.html" class="nav-week-link">W9</a>
+      <a href="week10.html" class="nav-week-link">W10</a>
+    </div>
+  </nav>
+
+  <main class="week-page">
+    <header class="week-hero">
+      <div class="week-hero-glow"></div>
+      <div class="week-hero-content">
+        <span class="week-badge">Week 4</span>
+        <h1>Format Strings & <span class="accent">Memory Safety</span></h1>
+        <p class="week-hero-sub">How format string vulnerabilities allow attackers to read and write arbitrary memory, the concepts of spatial and temporal memory safety, and command injection attacks.</p>
+      </div>
+    </header>
+
+    <section class="toc">
+      <h2>📑 Contents</h2>
+      <div class="toc-grid">
+        <a href="#format-strings" class="toc-item"><span class="toc-num">01</span><span class="toc-title">Format Strings</span></a>
+        <a href="#format-exploits" class="toc-item"><span class="toc-num">02</span><span class="toc-title">Format String Exploits</span></a>
+        <a href="#memory-safety" class="toc-item"><span class="toc-num">03</span><span class="toc-title">Memory Safety</span></a>
+        <a href="#command-injection" class="toc-item"><span class="toc-num">04</span><span class="toc-title">Command Injection</span></a>
+        <a href="#mitigations" class="toc-item"><span class="toc-num">05</span><span class="toc-title">Mitigations</span></a>
+      </div>
+    </section>
+
+    <!-- Format Strings -->
+    <section class="knowledge-section" id="format-strings">
+      <div class="section-header"><span class="section-icon">📝</span><h2>Format String Vulnerabilities</h2></div>
+      <div class="knowledge-card">
+        <h3>What Causes a Format String Vulnerability?</h3>
+        <p>Passing <strong>user-controlled input</strong> directly as the format string to functions like <code>printf()</code>, <code>fprintf()</code>, or <code>sprintf()</code>.</p>
+        <div class="comparison-grid">
+          <div class="comparison-item">
+            <h4>🔴 Dangerous</h4>
+            <div class="code-block"><pre><code>printf(buf);
+// User controls format string!</code></pre></div>
+          </div>
+          <div class="comparison-item">
+            <h4>🟢 Safe</h4>
+            <div class="code-block"><pre><code>printf("%s", buf);
+// buf treated as data only</code></pre></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Format String Exploits -->
+    <section class="knowledge-section" id="format-exploits">
+      <div class="section-header"><span class="section-icon">🔓</span><h2>Format String Exploits</h2></div>
+      <div class="knowledge-card">
+        <h3>Key Format Specifiers for Attacks</h3>
+        <table class="info-table">
+          <thead><tr><th>Specifier</th><th>Action</th><th>Security Impact</th></tr></thead>
+          <tbody>
+            <tr><td><code>%x</code></td><td>Reads 4 bytes from stack as hex</td><td><strong>Stack data leakage</strong></td></tr>
+            <tr><td><code>%n</code></td><td>Writes number of chars printed to address</td><td><strong>Arbitrary memory write</strong></td></tr>
+            <tr><td><code>%s</code></td><td>Reads string from pointer on stack</td><td><strong>Memory read</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="knowledge-card">
+        <h3>Leaking Stack Data</h3>
+        <p>By printing many <code>%x</code> specifiers, attackers can dump successive stack values — revealing local variables, saved registers, return addresses, and even canary values.</p>
+        <div class="code-block"><pre><code>// Attacker input: "%x %x %x %x %x %x"
+// Output: bffff7a0 0 b7e5e224 b7fd7ff4 bffff7a8 0804849e
+//         ↑ leaked stack data including addresses</code></pre></div>
+      </div>
+      <div class="knowledge-card">
+        <h3>Writing to Memory with %n</h3>
+        <p>The <code>%n</code> specifier writes the count of characters printed so far to a memory address. Using padding like <code>%1000x</code> lets attackers control the exact value written — achieving <strong>arbitrary memory writes</strong>.</p>
+        <div class="callout callout-danger"><strong>Critical:</strong> With <code>%n</code>, attackers can overwrite return addresses, GOT entries, or function pointers to hijack execution.</div>
+      </div>
+    </section>
+
+    <!-- Memory Safety -->
+    <section class="knowledge-section" id="memory-safety">
+      <div class="section-header"><span class="section-icon">🔒</span><h2>Memory Safety</h2></div>
+      <div class="knowledge-card">
+        <h3>Two Types of Memory Safety</h3>
+        <div class="comparison-grid">
+          <div class="comparison-item">
+            <h4>📐 Spatial Safety</h4>
+            <p>Ensuring accesses stay <strong>within allocated bounds</strong>. Violations: buffer overflows, out-of-bounds reads.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>⏱️ Temporal Safety</h4>
+            <p>Ensuring memory is accessed only while <strong>still allocated</strong>. Violations: use-after-free, dangling pointers.</p>
+          </div>
+        </div>
+      </div>
+      <div class="knowledge-card">
+        <h3>Use-After-Free</h3>
+        <p>Accessing memory after it has been <strong>freed</strong>. The memory may have been reallocated for a different purpose, leading to data corruption or code execution.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Why C Is Not Memory Safe</h3>
+        <p>C lacks automatic bounds checking and safe memory management. The programmer is fully responsible for ensuring all memory accesses are valid — and humans make mistakes.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Integer Overflow → Buffer Overflow</h3>
+        <p>Overflowed size calculations may allocate <strong>too little memory</strong>, causing later writes to overflow the undersized buffer.</p>
+        <div class="code-block"><pre><code>// If size overflows to a small value:
+int size = user_input + header_len;  // overflow!
+char *buf = malloc(size);            // tiny allocation
+memcpy(buf, data, user_input);       // massive overflow</code></pre></div>
+      </div>
+      <div class="knowledge-card">
+        <h3>Memory Safety vs Type Safety</h3>
+        <table class="info-table">
+          <thead><tr><th>Concept</th><th>What It Ensures</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Type Safety</strong></td><td>Prevents incorrect type interpretation</td></tr>
+            <tr><td><strong>Memory Safety</strong></td><td>Ensures valid bounds and lifetime of accesses</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Command Injection -->
+    <section class="knowledge-section" id="command-injection">
+      <div class="section-header"><span class="section-icon">💉</span><h2>Command Injection</h2></div>
+      <div class="knowledge-card">
+        <h3>Why <code>system()</code> with User Input Is Dangerous</h3>
+        <div class="code-block"><pre><code>system("time ./" + user_input);
+// If user_input = "prog; rm -rf /"
+// Executes: time ./prog; rm -rf /</code></pre></div>
+        <p>Attackers inject shell commands using metacharacters like <code>;</code>, <code>|</code>, <code>&&</code>, or backticks.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Prevention</h3>
+        <ul>
+          <li><strong>Use exec functions</strong> instead of shell commands (no shell interpretation)</li>
+          <li><strong>Sanitize</strong> dangerous characters from input</li>
+          <li><strong>Use allowlists</strong> — only accept known-safe input values</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Mitigations -->
+    <section class="knowledge-section" id="mitigations">
+      <div class="section-header"><span class="section-icon">✅</span><h2>Mitigations</h2></div>
+      <div class="knowledge-card">
+        <h3>Safe printf Usage</h3>
+        <p>Always use a format string literal and pass user input as an argument:</p>
+        <div class="code-block"><pre><code>printf("%s", user_input);  // ✅ SAFE — input is data
+printf(user_input);         // ❌ DANGEROUS — input is code</code></pre></div>
+        <div class="callout callout-info"><strong>Core Principle:</strong> Never treat untrusted input as executable code. This principle applies to buffer overflows, format strings, SQLi, and all injection attacks.</div>
+      </div>
+    </section>
+
+    <div class="week-nav-bottom">
+      <a href="week3.html" class="week-nav-link">← Week 3: Exploits & Defences</a>
+      <a href="week5.html" class="week-nav-link">Week 5: Race Conditions →</a>
+    </div>
+  </main>
+</body>
+</html>

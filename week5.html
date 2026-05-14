@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Week 5 — Race Conditions & Malware. Threading vulnerabilities, TOCTTOU attacks, and malware categories." />
+  <title>Week 5 — Race Conditions & Malware | SecFlash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="week-page.css" />
+</head>
+<body>
+  <nav id="week-nav">
+    <a href="index.html" class="nav-home">Sec<span class="accent">Flash</span></a>
+    <div class="nav-weeks">
+      <a href="week2.html" class="nav-week-link">W2</a>
+      <a href="week3.html" class="nav-week-link">W3</a>
+      <a href="week4.html" class="nav-week-link">W4</a>
+      <a href="week5.html" class="nav-week-link active">W5</a>
+      <a href="week6.html" class="nav-week-link">W6</a>
+      <a href="week7.html" class="nav-week-link">W7</a>
+      <a href="week8.html" class="nav-week-link">W8</a>
+      <a href="week9.html" class="nav-week-link">W9</a>
+      <a href="week10.html" class="nav-week-link">W10</a>
+    </div>
+  </nav>
+
+  <main class="week-page">
+    <header class="week-hero">
+      <div class="week-hero-glow"></div>
+      <div class="week-hero-content">
+        <span class="week-badge">Week 5</span>
+        <h1>Race Conditions & <span class="accent">Malware</span></h1>
+        <p class="week-hero-sub">How multithreading introduces race conditions and TOCTTOU vulnerabilities, defensive synchronisation primitives, and an overview of malware types from viruses to rootkits.</p>
+      </div>
+    </header>
+
+    <section class="toc">
+      <h2>📑 Contents</h2>
+      <div class="toc-grid">
+        <a href="#race-conditions" class="toc-item"><span class="toc-num">01</span><span class="toc-title">Race Conditions</span></a>
+        <a href="#tocttou" class="toc-item"><span class="toc-num">02</span><span class="toc-title">TOCTTOU Attacks</span></a>
+        <a href="#synchronisation" class="toc-item"><span class="toc-num">03</span><span class="toc-title">Synchronisation</span></a>
+        <a href="#malware" class="toc-item"><span class="toc-num">04</span><span class="toc-title">Malware Types</span></a>
+      </div>
+    </section>
+
+    <!-- Race Conditions -->
+    <section class="knowledge-section" id="race-conditions">
+      <div class="section-header"><span class="section-icon">🏁</span><h2>Race Conditions</h2></div>
+      <div class="knowledge-card">
+        <h3>What Is a Race Condition?</h3>
+        <p>A race condition occurs when <strong>multiple threads access shared data</strong> and the outcome depends on <strong>execution timing</strong>. The result is non-deterministic — correct behaviour relies on a specific (unguaranteed) ordering of operations.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Multithreading</h3>
+        <p>Running multiple threads within one process that <strong>share memory and resources</strong>. While this improves performance, it introduces the risk of concurrent access to shared state.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Critical Sections</h3>
+        <p>A <strong>critical section</strong> is a portion of code that accesses shared data and must only be executed by <strong>one thread at a time</strong>. If two threads enter a critical section simultaneously, data corruption or security vulnerabilities can result.</p>
+      </div>
+    </section>
+
+    <!-- TOCTTOU -->
+    <section class="knowledge-section" id="tocttou">
+      <div class="section-header"><span class="section-icon">⏱️</span><h2>TOCTTOU Attacks</h2></div>
+      <div class="knowledge-card">
+        <h3>Time-Of-Check To Time-Of-Use</h3>
+        <p><strong>TOCTTOU</strong> is a specific class of race condition where a resource changes between the time it's <strong>checked</strong> and the time it's <strong>used</strong>.</p>
+        <div class="attack-flow">
+          <div class="attack-step">Program checks file permissions</div>
+          <span class="attack-arrow">→</span>
+          <div class="attack-step">Attacker swaps file with symlink</div>
+          <span class="attack-arrow">→</span>
+          <div class="attack-step">Program writes to /etc/passwd</div>
+        </div>
+      </div>
+      <div class="knowledge-card">
+        <h3>Classic TOCTTOU Example</h3>
+        <div class="code-block"><pre><code>// 1. Check: Is the file safe to write?
+if (access("/tmp/userfile", W_OK) == 0) {
+    // 2. WINDOW: Attacker replaces file with symlink
+    //    ln -s /etc/passwd /tmp/userfile
+    
+    // 3. Use: Write to the file (now /etc/passwd!)
+    fd = open("/tmp/userfile", O_WRONLY);
+    write(fd, data, len);
+}</code></pre></div>
+        <div class="callout callout-danger"><strong>Impact:</strong> The attacker tricks a privileged program into writing to a sensitive system file.</div>
+      </div>
+    </section>
+
+    <!-- Synchronisation -->
+    <section class="knowledge-section" id="synchronisation">
+      <div class="section-header"><span class="section-icon">🔐</span><h2>Synchronisation Defences</h2></div>
+      <div class="knowledge-card">
+        <h3>Defensive Mechanisms</h3>
+        <table class="info-table">
+          <thead><tr><th>Mechanism</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Mutex</strong></td><td>A lock allowing only <strong>one thread</strong> into a critical section at a time</td></tr>
+            <tr><td><strong>Atomic Operations</strong></td><td><strong>Indivisible operations</strong> that complete without interruption</td></tr>
+            <tr><td><strong>Least Privilege</strong></td><td>Give only the <strong>minimum permissions</strong> required to limit damage</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Malware -->
+    <section class="knowledge-section" id="malware">
+      <div class="section-header"><span class="section-icon">🦠</span><h2>Malware Types</h2></div>
+      <div class="knowledge-card">
+        <h3>What Is Malware?</h3>
+        <p>Software designed to <strong>harm, exploit, or compromise</strong> systems. Malware encompasses a broad range of malicious software categories.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Malware Categories</h3>
+        <div class="comparison-grid">
+          <div class="comparison-item">
+            <h4>🔴 Virus</h4>
+            <p>Requires a <strong>host file</strong> and <strong>user action</strong> to spread. Attaches to legitimate programs.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>🟠 Worm</h4>
+            <p><strong>Self-replicates automatically</strong> across networks without user interaction.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>🟡 Trojan</h4>
+            <p>Malware <strong>disguised as legitimate software</strong>. User willingly installs it.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>🟣 Ransomware</h4>
+            <p><strong>Encrypts files</strong> and demands payment for the decryption key.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>🔵 Botnet</h4>
+            <p>A network of <strong>compromised machines</strong> controlled remotely by an attacker (C&C).</p>
+          </div>
+          <div class="comparison-item">
+            <h4>⚫ Rootkit</h4>
+            <p>Hides itself by <strong>modifying OS internals</strong>. Extremely difficult to detect.</p>
+          </div>
+        </div>
+      </div>
+      <div class="knowledge-card">
+        <h3>Virus vs Worm — Key Difference</h3>
+        <table class="info-table">
+          <thead><tr><th>Property</th><th>Virus</th><th>Worm</th></tr></thead>
+          <tbody>
+            <tr><td>Needs host file?</td><td>✅ Yes</td><td>❌ No</td></tr>
+            <tr><td>User action needed?</td><td>✅ Yes</td><td>❌ No</td></tr>
+            <tr><td>Self-replicates?</td><td>Only when host runs</td><td>Automatically</td></tr>
+            <tr><td>Spreads via</td><td>Infected files</td><td>Network vulnerabilities</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="week-nav-bottom">
+      <a href="week4.html" class="week-nav-link">← Week 4: Format Strings</a>
+      <a href="week6.html" class="week-nav-link">Week 6: Web Security →</a>
+    </div>
+  </main>
+</body>
+</html>

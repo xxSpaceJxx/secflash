@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Week 9 — Dynamic Analysis & Fuzzing. Penetration testing, fuzz testing, mutation vs generation-based fuzzing, and security testing plans." />
+  <title>Week 9 — Dynamic Analysis & Fuzzing | SecFlash</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="week-page.css" />
+</head>
+<body>
+  <nav id="week-nav">
+    <a href="index.html" class="nav-home">Sec<span class="accent">Flash</span></a>
+    <div class="nav-weeks">
+      <a href="week2.html" class="nav-week-link">W2</a>
+      <a href="week3.html" class="nav-week-link">W3</a>
+      <a href="week4.html" class="nav-week-link">W4</a>
+      <a href="week5.html" class="nav-week-link">W5</a>
+      <a href="week6.html" class="nav-week-link">W6</a>
+      <a href="week7.html" class="nav-week-link">W7</a>
+      <a href="week8.html" class="nav-week-link">W8</a>
+      <a href="week9.html" class="nav-week-link active">W9</a>
+      <a href="week10.html" class="nav-week-link">W10</a>
+    </div>
+  </nav>
+
+  <main class="week-page">
+    <header class="week-hero">
+      <div class="week-hero-glow"></div>
+      <div class="week-hero-content">
+        <span class="week-badge">Week 9</span>
+        <h1>Dynamic Analysis & <span class="accent">Fuzzing</span></h1>
+        <p class="week-hero-sub">Testing programs while they run — penetration testing, fuzz testing techniques, coverage-guided fuzzing, and structured security testing plans.</p>
+      </div>
+    </header>
+
+    <section class="toc">
+      <h2>📑 Contents</h2>
+      <div class="toc-grid">
+        <a href="#dast-vs-sast" class="toc-item"><span class="toc-num">01</span><span class="toc-title">DAST vs SAST</span></a>
+        <a href="#pen-testing" class="toc-item"><span class="toc-num">02</span><span class="toc-title">Penetration Testing</span></a>
+        <a href="#fuzzing" class="toc-item"><span class="toc-num">03</span><span class="toc-title">Fuzz Testing</span></a>
+        <a href="#advanced-fuzz" class="toc-item"><span class="toc-num">04</span><span class="toc-title">Advanced Fuzzing</span></a>
+        <a href="#test-plans" class="toc-item"><span class="toc-num">05</span><span class="toc-title">Security Testing Plans</span></a>
+        <a href="#patterns" class="toc-item"><span class="toc-num">06</span><span class="toc-title">Pattern-Based Testing</span></a>
+      </div>
+    </section>
+
+    <!-- DAST vs SAST -->
+    <section class="knowledge-section" id="dast-vs-sast">
+      <div class="section-header"><span class="section-icon">⚖️</span><h2>DAST vs SAST</h2></div>
+      <div class="knowledge-card">
+        <h3>Static vs Dynamic Analysis</h3>
+        <div class="comparison-grid">
+          <div class="comparison-item">
+            <h4>📄 Static Analysis (SAST)</h4>
+            <p>Examines source code <strong>without running</strong> the program. Finds issues like unsafe function calls, hardcoded secrets, and code patterns.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>▶️ Dynamic Analysis (DAST)</h4>
+            <p>Tests the program <strong>while it is running</strong>. Finds crashes, race conditions, memory errors, and runtime logic flaws.</p>
+          </div>
+        </div>
+      </div>
+      <div class="knowledge-card">
+        <h3>Why Both Are Needed</h3>
+        <p>Dynamic analysis finds vulnerabilities that <strong>only appear during execution</strong> — runtime behaviour, timing-dependent bugs, and real-world interaction patterns that static analysis cannot observe.</p>
+        <div class="callout callout-info"><strong>Complementary:</strong> SAST catches code-level issues early; DAST catches runtime issues late. Use both for comprehensive coverage.</div>
+      </div>
+    </section>
+
+    <!-- Penetration Testing -->
+    <section class="knowledge-section" id="pen-testing">
+      <div class="section-header"><span class="section-icon">🎯</span><h2>Penetration Testing</h2></div>
+      <div class="knowledge-card">
+        <h3>What Is Penetration Testing?</h3>
+        <p>A security testing approach that <strong>simulates real-world attacks</strong> against a system to identify vulnerabilities that an attacker could exploit. Testers think and act like adversaries.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>Functional Testing vs Penetration Testing</h3>
+        <table class="info-table">
+          <thead><tr><th>Aspect</th><th>Functional Testing</th><th>Penetration Testing</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Perspective</strong></td><td>Legitimate user</td><td>Attacker</td></tr>
+            <tr><td><strong>Goal</strong></td><td>Verify correct behaviour</td><td>Find exploitable weaknesses</td></tr>
+            <tr><td><strong>Inputs</strong></td><td>Valid, expected</td><td>Malicious, unexpected</td></tr>
+            <tr><td><strong>Success</strong></td><td>System works correctly</td><td>System is compromised</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="knowledge-card">
+        <h3>Limitations</h3>
+        <p>Penetration testing does <strong>not prove a system is secure</strong>. Failing to find vulnerabilities only proves that <strong>none were found under those specific test conditions</strong>. It does not guarantee that no vulnerabilities exist.</p>
+        <div class="callout callout-warning"><strong>Remember:</strong> "Absence of evidence is not evidence of absence." A clean pen test report means no bugs were found — not that none exist.</div>
+      </div>
+    </section>
+
+    <!-- Fuzz Testing -->
+    <section class="knowledge-section" id="fuzzing">
+      <div class="section-header"><span class="section-icon">🎲</span><h2>Fuzz Testing</h2></div>
+      <div class="knowledge-card">
+        <h3>What Is Fuzzing?</h3>
+        <p>An automated testing technique that sends <strong>unexpected, malformed, or random inputs</strong> to a program to discover crashes, hangs, or vulnerabilities. It's highly effective at finding edge-case bugs that manual testing misses.</p>
+      </div>
+      <div class="knowledge-card">
+        <h3>The 6 Steps of Fuzz Testing</h3>
+        <ol class="step-list">
+          <li><strong>Identify the target system</strong> — what program to test</li>
+          <li><strong>Identify inputs</strong> — files, network data, API calls</li>
+          <li><strong>Generate fuzz data</strong> — create malformed inputs</li>
+          <li><strong>Execute tests</strong> — feed inputs to the program</li>
+          <li><strong>Monitor behaviour</strong> — watch for crashes, hangs, errors</li>
+          <li><strong>Log defects</strong> — record inputs that trigger bugs</li>
+        </ol>
+      </div>
+      <div class="knowledge-card">
+        <h3>Mutation-Based vs Generation-Based</h3>
+        <div class="comparison-grid">
+          <div class="comparison-item">
+            <h4>🔄 Mutation-Based</h4>
+            <p><strong>Modifies existing valid inputs</strong> by flipping bits, inserting random data, or truncating. Easy to set up but may miss deeply structured inputs.</p>
+          </div>
+          <div class="comparison-item">
+            <h4>🏗️ Generation-Based</h4>
+            <p><strong>Creates inputs from specification rules</strong> (protocol definitions, grammars). More thorough but requires knowledge of the input format.</p>
+          </div>
+        </div>
+      </div>
+      <div class="knowledge-card">
+        <h3>What Fuzzing Can Detect</h3>
+        <ul>
+          <li><strong>Segmentation faults</strong> — invalid memory access</li>
+          <li><strong>Use-after-free</strong> — accessing freed memory</li>
+          <li><strong>Null pointer dereference</strong> — accessing address 0</li>
+          <li><strong>Race conditions</strong> — timing-dependent bugs</li>
+          <li><strong>Infinite loops / hangs</strong> — program stops responding</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Advanced Fuzzing -->
+    <section class="knowledge-section" id="advanced-fuzz">
+      <div class="section-header"><span class="section-icon">🧬</span><h2>Advanced Fuzzing</h2></div>
+      <div class="knowledge-card">
+        <h3>Coverage-Guided Fuzzing (Grey-Box / White-Box)</h3>
+        <p>Uses <strong>instrumentation</strong> to observe which program paths are executed during each test. The fuzzer then generates inputs that explore <strong>new code paths</strong> instead of repeating the same ones.</p>
+        <div class="attack-flow">
+          <div class="attack-step">Generate input</div>
+          <span class="attack-arrow">→</span>
+          <div class="attack-step">Execute & measure coverage</div>
+          <span class="attack-arrow">→</span>
+          <div class="attack-step">Mutate inputs hitting new paths</div>
+          <span class="attack-arrow">→</span>
+          <div class="attack-step">Repeat</div>
+        </div>
+        <div class="callout callout-success"><strong>Key Advantage:</strong> Coverage-guided fuzzers like AFL and libFuzzer can systematically explore deep program logic that random fuzzing would take exponentially longer to reach.</div>
+      </div>
+    </section>
+
+    <!-- Security Testing Plans -->
+    <section class="knowledge-section" id="test-plans">
+      <div class="section-header"><span class="section-icon">📋</span><h2>Security Testing Plans</h2></div>
+      <div class="knowledge-card">
+        <h3>What Is a Security Testing Plan?</h3>
+        <p>A formal document describing:</p>
+        <ul>
+          <li><strong>What</strong> will be tested (scope, targets)</li>
+          <li><strong>Why</strong> (risk assessment, business requirements)</li>
+          <li><strong>How</strong> (methodology, tools, techniques)</li>
+          <li><strong>When</strong> (timeline, milestones)</li>
+          <li><strong>Who</strong> is responsible for each testing activity</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Pattern-Based Testing -->
+    <section class="knowledge-section" id="patterns">
+      <div class="section-header"><span class="section-icon">🔲</span><h2>Pattern-Based Testing</h2></div>
+      <div class="knowledge-card">
+        <h3>Input Validation Vulnerability Test Pattern</h3>
+        <p>A structured approach to testing input handling. Targets vulnerabilities caused by insufficient input validation:</p>
+        <ul>
+          <li><strong>SQL Injection</strong> — injecting SQL through form fields</li>
+          <li><strong>Path Traversal</strong> — accessing files outside intended directories (e.g., <code>../../etc/passwd</code>)</li>
+          <li><strong>PHP File Inclusion</strong> — including remote or local files through parameters</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="week-nav-bottom">
+      <a href="week8.html" class="week-nav-link">← Week 8: Security Testing</a>
+      <a href="week10.html" class="week-nav-link">Week 10: Secure Dev →</a>
+    </div>
+  </main>
+</body>
+</html>
